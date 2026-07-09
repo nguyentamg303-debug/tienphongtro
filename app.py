@@ -607,40 +607,22 @@ elif menu == "Nhập chỉ số":
 
 # Nếu menu khác, bạn tiếp tục với các elif tiếp theo...
 # ... các phần menu khác ...
-if exist:
-    st.error("Tên phòng đã tồn tại.")
-else:
-    conn.execute(...)
-    conn.commit()
-
-income = pd.read_sql("""
-SELECT
-month,
-SUM(total) total
-FROM meter
-GROUP BY month
-""",conn)
-
-fig = px.bar(
-    income,
-    x="month",
-    y="total",
-    text="total"
-)
-
-st.plotly_chart(
-    fig,
-    use_container_width=True)
-paid = pd.read_sql("""
-    SELECT * FROM payment_table
-""", conn)
-
-fig = px.pie(
-    paid,
-    names="paid",
-    values="sl"
-)
-
+elif menu == "Nhập chỉ số":
+    st.subheader("📝 Nhập chỉ số điện nước")
+    room_input = st.text_input("Nhập số phòng:")
+    
+    if room_input:
+        # Truy vấn trực tiếp tại đây
+        exist = conn.execute("SELECT room FROM rooms WHERE room=?", (room_input,)).fetchone()
+        
+        # Kiểm tra ngay sau khi truy vấn
+        if exist:
+            st.success(f"Phòng {room_input} tồn tại.")
+            # ... xử lý tiếp theo ...
+        else:
+            st.warning("Phòng này không tồn tại.")
+    else:
+        st.info("Vui lòng nhập số phòng.")
 # --- 1. PHẦN ĐỊNH NGHĨA HÀM (Luôn đặt trên cùng) ---
 def export_excel(df):
     wb = Workbook()
