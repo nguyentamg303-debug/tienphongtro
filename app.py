@@ -627,113 +627,68 @@ fig = px.pie(
     values="sl"
 )
 
-st.plotly_chart(fig)if total > 0:
-    st.toast(
-        f"Đã tính tiền {room}"
-)bank = "970422"
-account = "0123456789"
-
-vietqr = f"https://img.vietqr.io/image/{bank}-{account}-compact.png?amount={total}&addInfo={room}"
-
-st.image(
-    vietqr,
-    width=250
-)st.metric(
-    "Tổng doanh thu",
-    f"{meter_df['total'].sum():,.0f} VNĐ"
-)
-
-st.metric(
-    "Đã thu",
-    f"{meter_df[meter_df.paid==1]['total'].sum():,.0f}"
-)
-
-st.metric(
-    "Chưa thu",
-    f"{meter_df[meter_df.paid==0]['total'].sum():,.0f}"
-)last = conn.execute("""
-SELECT
-new_electric,
-new_water
-FROM meter
-WHERE room=?
-ORDER BY id DESC
-LIMIT 1
-""",(room,)).fetchone()
-
-old_electric = last[0] if last else 0
-old_water = last[1] if last else 0
+# --- 1. PHẦN ĐỊNH NGHĨA HÀM (Luôn đặt trên cùng) ---
 def export_excel(df):
     wb = Workbook()
     ws = wb.active
     ws.title = "HoaDon"
-
     ws.append(list(df.columns))
-
     for row in df.values.tolist():
         ws.append(row)
-
     buffer = BytesIO()
     wb.save(buffer)
     buffer.seek(0)
-    return bufferexcel = export_excel(df)
+    return buffer
 
+# --- 2. PHẦN HIỂN THỊ DỮ LIỆU ---
+st.plotly_chart(fig)
+
+if total > 0:
+    st.toast(f"Đã tính tiền {room}")
+
+# Hiển thị VietQR
+bank, account = "970422", "0123456789"
+vietqr = f"https://img.vietqr.io/image/{bank}-{account}-compact.png?amount={total}&addInfo={room}"
+st.image(vietqr, width=250)
+
+# Hiển thị số liệu thống kê
+st.metric("Tổng doanh thu", f"{meter_df['total'].sum():,.0f} VNĐ")
+st.metric("Đã thu", f"{meter_df[meter_df.paid==1]['total'].sum():,.0f}")
+st.metric("Chưa thu", f"{meter_df[meter_df.paid==0]['total'].sum():,.0f}")
+
+# --- 3. CÁC TÁC VỤ (Xuất file, tin nhắn, tìm kiếm) ---
+excel_data = export_excel(df)
 st.download_button(
     "📥 Xuất Excel",
-    data=excel,
+    data=excel_data,
     file_name=f"HoaDon_{month}.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)messages = []
+)
 
-for _, row in df.iterrows():
-    messages.append(
-        f"""🏠 {row['room']}
-Tổng tiền: {row['total']:,.0f}đ"""
-    )
+messages = [f"🏠 {row['room']}\nTổng tiền: {row['total']:,.0f}đ" for _, row in df.iterrows()]
+st.text_area("Tin nhắn tổng hợp", "\n\n".join(messages), height=300)
 
-st.text_area(
-    "Tin nhắn tổng hợp",
-    "\n\n".join(messages),
-    height=300
-)keyword = st.text_input("🔍 Tìm phòng")
+keyword = st.text_input("🔍 Tìm phòng")
+df_display = df[df["room"].str.contains(keyword, case=False)] if keyword else df
+st.dataframe(df_display, use_container_width=True)
 
-if keyword:
-    df = df[df["room"].str.contains(keyword, case=False)]
-
-st.dataframe(df, use_container_width=True)room = st.selectbox("Chọn phòng", rooms["room"])
-
+# --- 4. PHẦN CẬP NHẬT DỮ LIỆU ---
+st.subheader("⚙️ Quản lý và Cấu hình")
+room_select = st.selectbox("Chọn phòng", rooms["room"])
 new_name = st.text_input("Người thuê")
-
 new_phone = st.text_input("SĐT")
 
 if st.button("Cập nhật"):
-
-    conn.execute("""
-        UPDATE rooms
-        SET tenant=?,
-            phone=?
-        WHERE room=?
-    """,
-    (new_name, new_phone, room))
-
+    conn.execute("UPDATE rooms SET tenant=?, phone=? WHERE room=?", (new_name, new_phone, room_select))
     conn.commit()
+    st.success("Đã cập nhật.")
 
-    st.success("Đã cập nhật.")month = st.selectbox(
-    "Tháng",
-    months["month"]
-)
-
+st.divider()
+month_select = st.selectbox("Tháng", months["month"])
 if st.button("Xóa dữ liệu tháng"):
-
-    conn.execute(
-        "DELETE FROM meter WHERE month=?",
-        (month,)
-    )
-
+    conn.execute("DELETE FROM meter WHERE month=?", (month_select,))
     conn.commit()
+    st.success("Đã xóa.")
 
-    st.success("Đã xóa.")st.divider()
-
-st.caption(
-    "🏠 Hệ thống quản lý phòng trọ - Streamlit Edition"
-)
+st.divider()
+st.caption("🏠 Hệ thống quản lý phòng trọ - Streamlit Edition")
