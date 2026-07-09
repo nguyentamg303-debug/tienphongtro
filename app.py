@@ -565,7 +565,7 @@ menu = st.sidebar.radio(
     ["Dashboard", "Quản lý phòng", "Nhập chỉ số", "Hóa đơn", "Lịch sử", "Sao lưu", "Cài đặt"]
 )
 
-# --- 2. CÁC HÀM XỬ LÝ (Đặt tách biệt) ---
+# --- 1. CÁC HÀM XỬ LÝ (Đặt tách biệt) ---
 @st.cache_data(ttl=60)
 def load_rooms():
     return pd.read_sql("SELECT * FROM rooms", conn)
@@ -573,6 +573,10 @@ def load_rooms():
 @st.cache_data(ttl=60)
 def load_meter():
     return pd.read_sql("SELECT * FROM meter", conn)
+
+# --- 2. XỬ LÝ LOGIC CHÍNH ---
+# Nên load dữ liệu trước khi dùng
+rooms_df = load_rooms()
 
 # --- 3. PHẦN NỘI DUNG (Sử dụng các khối if/elif) ---
 
@@ -583,15 +587,25 @@ if menu == "Cài đặt":
         Dữ liệu lưu trong SQLite.
         Chương trình tự ghi nhớ số điện và nước tháng trước.
     """)
-    # Nếu cần xóa cache tại đây:
-    # st.cache_data.clear()
 
 elif menu == "Nhập chỉ số":
-    # Ví dụ kiểm tra phòng tồn tại
-    # room = st.text_input("Nhập số phòng:")
-    # exist = conn.execute("SELECT room FROM rooms WHERE room=?", (room,)).fetchone()
-    pass
+    st.subheader("📝 Nhập chỉ số điện nước")
+    room_input = st.text_input("Nhập số phòng cần kiểm tra:")
+    
+    if room_input:
+        # Thực hiện truy vấn để tìm phòng
+        exist = conn.execute("SELECT room FROM rooms WHERE room=?", (room_input,)).fetchone()
+        
+        # Bây giờ 'exist' đã được định nghĩa, an toàn để kiểm tra
+        if exist:
+            st.success(f"Phòng {room_input} đã tồn tại trong hệ thống.")
+            # Thực hiện các logic nhập chỉ số tại đây...
+        else:
+            st.warning("Không tìm thấy phòng này trong cơ sở dữ liệu.")
+    else:
+        st.info("Vui lòng nhập số phòng để bắt đầu.")
 
+# Nếu menu khác, bạn tiếp tục với các elif tiếp theo...
 # ... các phần menu khác ...
 if exist:
     st.error("Tên phòng đã tồn tại.")
