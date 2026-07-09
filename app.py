@@ -627,22 +627,24 @@ elif menu == "Nhập chỉ số":
 def export_excel(df):
     wb = Workbook()
     ws = wb.active
-    ws.title = "HoaDon"
-    ws.append(list(df.columns))
-    for row in df.values.tolist():
-        ws.append(row)
-    buffer = BytesIO()
-    wb.save(buffer)
-    buffer.seek(0)
-    return buffer
+   # --- 1. KHỞI TẠO BIỂU ĐỒ (Dòng 630-639) ---
+# Kiểm tra nếu dữ liệu tồn tại thì tạo biểu đồ, nếu không thì tạo biểu đồ trống
+if 'df' in locals() and not df.empty:
+    fig = px.bar(df, x="room", y="total", title="Biểu đồ doanh thu")
+else:
+    # Tạo một biểu đồ trống hoặc thông báo
+    fig = px.bar(title="Chưa có dữ liệu để hiển thị biểu đồ")
 
-# --- 2. PHẦN HIỂN THỊ DỮ LIỆU ---
+# --- 2. PHẦN HIỂN THỊ DỮ LIỆU (Dòng 640 trở đi) ---
 st.plotly_chart(fig)
+
 if total > 0:
     st.toast(f"Đã tính tiền {room}")
+
 # Hiển thị VietQR
 bank, account = "970422", "0123456789"
 vietqr = f"https://img.vietqr.io/image/{bank}-{account}-compact.png?amount={total}&addInfo={room}"
+st.image(vietqr, width=250)
 st.image(vietqr, width=250)
 # Hiển thị số liệu thống kê
 st.metric("Tổng doanh thu", f"{meter_df['total'].sum():,.0f} VNĐ")
