@@ -597,7 +597,7 @@ if exist:
     st.error("Tên phòng đã tồn tại.")
 else:
     conn.execute(...)
-    conn.commit()import plotly.express as px
+    conn.commit()
 
 income = pd.read_sql("""
 SELECT
