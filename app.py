@@ -616,14 +616,10 @@ fig = px.bar(
 
 st.plotly_chart(
     fig,
-    use_container_width=True
-)paid = pd.read_sql("""
-SELECT
-paid,
-COUNT(*) sl
-FROM meter
-GROUP BY paid
-""",conn)
+    use_container_width=True)
+paid = pd.read_sql("""
+    SELECT * FROM payment_table
+""", conn)
 
 fig = px.pie(
     paid,
