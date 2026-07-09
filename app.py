@@ -576,7 +576,7 @@ elif menu == "Cài đặt":
         Chương trình tự ghi nhớ
         số điện và nước tháng trước.
         """
-      )menu = st.sidebar.radio(
+      )menu = st.sidebar.radio
     "Menu",
     [
         "Dashboard",
