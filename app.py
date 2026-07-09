@@ -638,15 +638,12 @@ def export_excel(df):
 
 # --- 2. PHẦN HIỂN THỊ DỮ LIỆU ---
 st.plotly_chart(fig)
-
 if total > 0:
     st.toast(f"Đã tính tiền {room}")
-
 # Hiển thị VietQR
 bank, account = "970422", "0123456789"
 vietqr = f"https://img.vietqr.io/image/{bank}-{account}-compact.png?amount={total}&addInfo={room}"
 st.image(vietqr, width=250)
-
 # Hiển thị số liệu thống kê
 st.metric("Tổng doanh thu", f"{meter_df['total'].sum():,.0f} VNĐ")
 st.metric("Đã thu", f"{meter_df[meter_df.paid==1]['total'].sum():,.0f}")
