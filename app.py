@@ -578,12 +578,10 @@ elif menu == "Cài đặt":
         """
       )menu = st.sidebar.radio
     "Menu",
-    [
-        "Dashboard",
+    ["Dashboard",
         "Quản lý phòng",
         "Nhập chỉ số",
-        "Hóa đơn"
-    ]
+        "Hóa đơn"]
       )menu = st.sidebar.radio(
     "📋 Menu",
     [
