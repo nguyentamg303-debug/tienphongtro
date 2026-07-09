@@ -582,18 +582,13 @@ elif menu == "Cài đặt":
         "Quản lý phòng",
         "Nhập chỉ số",
         "Hóa đơn"]
-      )menu = st.sidebar.radio(
-    "📋 Menu",
-    [
-        "Dashboard",
+      )menu = st.sidebar.radio("📋 Menu",["Dashboard",
         "Quản lý phòng",
         "Nhập chỉ số",
         "Hóa đơn",
         "Lịch sử",
         "Sao lưu",
-        "Cài đặt"
-    ]
-  )@st.cache_data(ttl=60)
+        "Cài đặt"])@st.cache_data(ttl=60)
 def load_rooms():
     return pd.read_sql(
         "SELECT * FROM rooms",
