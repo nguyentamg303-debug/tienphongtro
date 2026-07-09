@@ -558,42 +558,41 @@ elif menu == "Xóa phòng":
 
         st.success("Đã xóa phòng.")
 
-# =========================
-# CÀI ĐẶT
-# =========================
+# --- 1. PHẦN MENU (Đặt ở trên cùng, ngoài các khối if) ---
+st.sidebar.title("📋 Điều hướng")
+menu = st.sidebar.radio(
+    "Menu", 
+    ["Dashboard", "Quản lý phòng", "Nhập chỉ số", "Hóa đơn", "Lịch sử", "Sao lưu", "Cài đặt"]
+)
 
-elif menu == "Cài đặt":
-
-    st.subheader("⚙️ Cấu hình")
-
-    st.info(
-        """
-        Giá điện, nước được thay đổi
-        ở Sidebar.
-
-        Dữ liệu lưu trong SQLite.
-
-        Chương trình tự ghi nhớ
-        số điện và nước tháng trước.
-        """
-      )menu = st.sidebar.radio
-    "Menu",["Dashboard","Quản lý phòng","Nhập chỉ số","Hóa đơn"])menu = st.sidebar.radio("📋 Menu",["Dashboard","Quản lý phòng","Nhập chỉ số","Hóa đơn","Lịch sử","Sao lưu","Cài đặt"])@st.cache_data(ttl=60)
+# --- 2. CÁC HÀM XỬ LÝ (Đặt tách biệt) ---
+@st.cache_data(ttl=60)
 def load_rooms():
-    return pd.read_sql(
-        "SELECT * FROM rooms",
-        conn
-    )
+    return pd.read_sql("SELECT * FROM rooms", conn)
 
 @st.cache_data(ttl=60)
 def load_meter():
-    return pd.read_sql(
-        "SELECT * FROM meter",
-        conn
-  )st.cache_data.clear()exist = conn.execute(
-    "SELECT room FROM rooms WHERE room=?",
-    (room,)
-).fetchone()
+    return pd.read_sql("SELECT * FROM meter", conn)
 
+# --- 3. PHẦN NỘI DUNG (Sử dụng các khối if/elif) ---
+
+if menu == "Cài đặt":
+    st.subheader("⚙️ Cấu hình")
+    st.info("""
+        Giá điện, nước được thay đổi ở Sidebar.
+        Dữ liệu lưu trong SQLite.
+        Chương trình tự ghi nhớ số điện và nước tháng trước.
+    """)
+    # Nếu cần xóa cache tại đây:
+    # st.cache_data.clear()
+
+elif menu == "Nhập chỉ số":
+    # Ví dụ kiểm tra phòng tồn tại
+    # room = st.text_input("Nhập số phòng:")
+    # exist = conn.execute("SELECT room FROM rooms WHERE room=?", (room,)).fetchone()
+    pass
+
+# ... các phần menu khác ...
 if exist:
     st.error("Tên phòng đã tồn tại.")
 else:
