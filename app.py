@@ -577,18 +577,7 @@ elif menu == "Cài đặt":
         số điện và nước tháng trước.
         """
       )menu = st.sidebar.radio
-    "Menu",
-    ["Dashboard",
-        "Quản lý phòng",
-        "Nhập chỉ số",
-        "Hóa đơn"]
-      )menu = st.sidebar.radio("📋 Menu",["Dashboard",
-        "Quản lý phòng",
-        "Nhập chỉ số",
-        "Hóa đơn",
-        "Lịch sử",
-        "Sao lưu",
-        "Cài đặt"])@st.cache_data(ttl=60)
+    "Menu",["Dashboard","Quản lý phòng","Nhập chỉ số","Hóa đơn"])menu = st.sidebar.radio("📋 Menu",["Dashboard","Quản lý phòng","Nhập chỉ số","Hóa đơn","Lịch sử","Sao lưu","Cài đặt"])@st.cache_data(ttl=60)
 def load_rooms():
     return pd.read_sql(
         "SELECT * FROM rooms",
